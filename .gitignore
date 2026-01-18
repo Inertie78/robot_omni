@@ -29,12 +29,13 @@ lib/*.so
 lib/*.dll
 
 # ============================
-# Python virtual env (si utilisé)
+# Python virtual env
 # ============================
 
 .venv/
 env/
 venv/
+__pycache__/
 
 # ============================
 # Logs / Temp
@@ -42,19 +43,11 @@ venv/
 
 *.log
 *.tmp
-.DS_Store
 
 # ============================
-# PlatformIO project structure
+# PlatformIO generated files
 # ============================
 
-# Keep source files
-include/
-lib/
-src/
-test/
-
-# Ignore generated files
 *.elf
 *.bin
 *.hex
@@ -74,7 +67,26 @@ desktop.ini
 # Linux
 *~
 
-# FreeCad
+# ============================
+# FreeCAD
+# ============================
+
 *.FCStd1
 *.stl
 *.obj
+*.iges
+*.igs
+
+# ============================
+# IA / modèles
+# ============================
+
+*.npz
+*.pth
+*.pt
+*.onnx
+
+# Exceptions pour Arduino
+!arduino/
+!arduino/src/
+!arduino/src/**
