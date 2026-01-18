@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>AxisOne – IA</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<header>
+    <h1>AxisOne – IA</h1>
+    <nav>
+        <a href="index.html">Cockpit</a>
+        <a href="ia.html" class="active">IA</a>
+        <a href="pi.html">PI</a>
+        <a href="config.html">Config</a>
+    </nav>
+</header>
+
+<!-- ===========================
+     IA – Contrôles & Stats
+=========================== -->
+<section class="card">
+    <h2>🤖 IA – Apprentissage TD3</h2>
+
+    <div class="mode-row">
+        <button class="hud-btn mode" onclick="saveAI()">SAVE AI</button>
+        <button class="hud-btn mode" onclick="loadAI()">LOAD AI</button>
+        <button class="hud-btn mode" onclick="toggleIADebug()">DEBUG IA</button>
+    </div>
+
+    <!-- HUD IA (statistiques principales) -->
+    <div id="aiDisplay" class="hud-grid-3">
+
+        <div class="hud-item">
+            <label>Action vx
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Composante X de l’action envoyée au robot (vitesse latérale).
+                    </span>
+                </span>
+            </label>
+            <span id="hud_vx">--</span>
+        </div>
+
+        <div class="hud-item">
+            <label>Action vy
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Composante Y de l’action envoyée au robot (vitesse avant/arrière).
+                    </span>
+                </span>
+            </label>
+            <span id="hud_vy">--</span>
+        </div>
+
+        <div class="hud-item">
+            <label>Action w
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Vitesse de rotation envoyée au robot.
+                    </span>
+                </span>
+            </label>
+            <span id="hud_w">--</span>
+        </div>
+
+        <div class="hud-item">
+            <label>Reward
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Récompense instantanée donnée à l’IA pour cette étape.
+                        Indique si l’action a été bénéfique ou non.
+                    </span>
+                </span>
+            </label>
+            <span id="hud_reward">--</span>
+        </div>
+
+        <div class="hud-item">
+            <label>Distance
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Distance actuelle entre le robot et la cible.
+                    </span>
+                </span>
+            </label>
+            <span id="hud_dist">--</span>
+        </div>
+
+        <div class="hud-item">
+            <label>Steps
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Nombre total d’updates TD3 effectués depuis le début.
+                    </span>
+                </span>
+            </label>
+            <span id="hud_steps">--</span>
+        </div>
+
+        <div class="hud-item">
+            <label>Speed x
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Vitesse réelle du robot sur l’axe X (mesurée par l’environnement).
+                    </span>
+                </span>
+            </label>
+            <span id="hud_sx">--</span>
+        </div>
+
+        <div class="hud-item">
+            <label>Speed y
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Vitesse réelle du robot sur l’axe Y.
+                    </span>
+                </span>
+            </label>
+            <span id="hud_sy">--</span>
+        </div>
+
+        <div class="hud-item">
+            <label>Critic Loss
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Erreur du Critic TD3. Indique la stabilité de l’évaluation des actions.
+                    </span>
+                </span>
+            </label>
+            <span id="hud_closs">--</span>
+        </div>
+
+        <div class="hud-item">
+            <label>Actor Loss
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Erreur de l’Actor TD3. Indique la qualité de la politique apprise.
+                    </span>
+                </span>
+            </label>
+            <span id="hud_aloss">--</span>
+        </div>
+
+    </div>
+
+    <!-- Graphiques IA -->
+    <div class="graph-row">
+
+        <div class="graph-card">
+            <h3>
+                Reward (dernières étapes)
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Affiche l’évolution du reward sur les dernières étapes.
+                        Permet de visualiser la stabilité et la progression de l’apprentissage TD3.
+                    </span>
+                </span>
+            </h3>
+            <canvas id="rewardCanvas" width="300" height="150"></canvas>
+        </div>
+
+        <div class="graph-card">
+            <h3>
+                Losses TD3 (Critic / Actor)
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Critic Loss = stabilité des Q-values.
+                        Actor Loss = qualité de la politique apprise.
+                        Permet de détecter sur-apprentissage ou instabilité.
+                    </span>
+                </span>
+            </h3>
+            <canvas id="lossCanvas" width="300" height="150"></canvas>
+        </div>
+
+        <div class="graph-card"> 
+            <h3>
+                Reward par épisode
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Affiche le reward total de chaque épisode.
+                        Permet de voir la progression globale de l’IA.
+                    </span>
+                </span>
+            </h3> 
+            <canvas id="episodeRewardCanvas" width="300" height="150"></canvas> 
+        </div>
+
+    </div>
+
+    <!-- Debug brut IA -->
+    <pre id="aiDebug" class="enc-box" style="display:none; max-height:150px; overflow:auto;"></pre>
+</section>
+
+<!-- ===========================
+     IA – TD3 Live (Vue détaillée)
+=========================== -->
+<section class="card">
+    <h2>🧠 IA – TD3 Live</h2>
+
+    <div class="hud-grid-3">
+
+        <div class="hud-item">
+            <label>vx
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">Action vx envoyée par l’IA.</span>
+                </span>
+            </label>
+            <span id="ia_vx">--</span>
+        </div>
+
+        <div class="hud-item">
+            <label>vy
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">Action vy envoyée par l’IA.</span>
+                </span>
+            </label>
+            <span id="ia_vy">--</span>
+        </div>
+
+        <div class="hud-item">
+            <label>w
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">Action de rotation envoyée par l’IA.</span>
+                </span>
+            </label>
+            <span id="ia_w">--</span>
+        </div>
+
+        <div class="hud-item">
+            <label>Reward
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">Récompense instantanée de l’étape actuelle.</span>
+                </span>
+            </label>
+            <span id="ia_reward">--</span>
+        </div>
+
+        <div class="hud-item">
+            <label>Critic
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">Critic Loss pour cette étape.</span>
+                </span>
+            </label>
+            <span id="ia_critic">--</span>
+        </div>
+
+        <div class="hud-item">
+            <label>Actor
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">Actor Loss pour cette étape.</span>
+                </span>
+            </label>
+            <span id="ia_actor">--</span>
+        </div>
+
+        <div class="hud-item">
+            <label>Distance
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">Distance actuelle au point cible.</span>
+                </span>
+            </label>
+            <span id="ia_dist">--</span>
+        </div>
+
+        <div class="hud-item">
+            <label>Speed X
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">Vitesse réelle du robot sur l’axe X.</span>
+                </span>
+            </label>
+            <span id="ia_sx">--</span>
+        </div>
+
+        <div class="hud-item">
+            <label>Speed Y
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">Vitesse réelle du robot sur l’axe Y.</span>
+                </span>
+            </label>
+            <span id="ia_sy">--</span>
+        </div>
+
+    </div>
+
+    <div class="hud-grid-3">
+
+        <div class="hud-item">
+            <label>Step
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">Nombre total d’updates TD3 effectués.</span>
+                </span>
+            </label>
+            <span id="ia_step">--</span>
+        </div>
+
+        <div class="hud-item">
+            <label>Updates
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">Nombre d’updates Critic/Actor cumulés.</span>
+                </span>
+            </label>
+            <span id="ia_updates">--</span>
+        </div>
+
+        <div class="hud-item">
+            <label>Episode
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">Numéro de l’épisode en cours.</span>
+                </span>
+            </label>
+            <span id="ia_episode">--</span>
+        </div>
+
+    </div>
+</section>
+
+<script src="ia.js"></script>
+</body>
+</html>

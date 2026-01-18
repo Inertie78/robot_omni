@@ -1,0 +1,80 @@
+# ============================
+# PlatformIO / VSCode / Build
+# ============================
+
+# PlatformIO build directory
+.pio/
+
+# VSCode settings
+.vscode/
+
+# Old backups or temporary folders
+.old/
+
+# ============================
+# C/C++ / Firmware
+# ============================
+
+# Compiled object files
+*.o
+*.obj
+
+# Precompiled headers
+*.gch
+*.pch
+
+# Libraries build artifacts
+lib/*.a
+lib/*.so
+lib/*.dll
+
+# ============================
+# Python virtual env (si utilisé)
+# ============================
+
+.venv/
+env/
+venv/
+
+# ============================
+# Logs / Temp
+# ============================
+
+*.log
+*.tmp
+.DS_Store
+
+# ============================
+# PlatformIO project structure
+# ============================
+
+# Keep source files
+include/
+lib/
+src/
+test/
+
+# Ignore generated files
+*.elf
+*.bin
+*.hex
+*.map
+
+# ============================
+# OS-specific
+# ============================
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# Linux
+*~
+
+# FreeCad
+*.FCStd1
+*.stl
+*.obj

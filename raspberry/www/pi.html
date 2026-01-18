@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>AxisOne – Système</title>
+
+    <!-- Styles cockpit -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<!-- ===========================
+     HEADER + NAVIGATION
+=========================== -->
+<header>
+    <h1>AxisOne – Infos Système</h1>
+    <nav>
+        <a href="index.html">Cockpit</a>
+        <a href="ia.html">IA</a>
+        <a href="pi.html">PI</a>
+        <a href="config.html">Config</a>
+    </nav>
+</header>
+
+<!-- ===========================
+     CARTE SYSTÈME
+=========================== -->
+<section class="card system-card">
+
+    <h2>📟 Raspberry Pi – Monitoring</h2>
+
+    <!-- Grille des infos système -->
+    <div class="sys-grid">
+
+        <!-- IP -->
+        <div class="sys-item">
+            <div class="sys-label">Adresse IP</div>
+            <div class="sys-value" id="sys-ip">--</div>
+        </div>
+
+        <!-- Température CPU -->
+        <div class="sys-item">
+            <div class="sys-label">Température CPU</div>
+            <div class="sys-value" id="sys-temp">-- °C</div>
+            <div class="sys-bar"><div id="bar-temp"></div></div>
+        </div>
+
+        <!-- Charge CPU -->
+        <div class="sys-item">
+            <div class="sys-label">Charge CPU</div>
+            <div class="sys-value" id="sys-cpu">-- %</div>
+            <div class="sys-bar"><div id="bar-cpu"></div></div>
+        </div>
+
+        <!-- RAM -->
+        <div class="sys-item">
+            <div class="sys-label">RAM</div>
+            <div class="sys-value" id="sys-ram">-- / -- MB</div>
+            <div class="sys-bar"><div id="bar-ram"></div></div>
+        </div>
+
+        <!-- Disque -->
+        <div class="sys-item">
+            <div class="sys-label">Disque</div>
+            <div class="sys-value" id="sys-disk">-- / -- GB</div>
+            <div class="sys-bar"><div id="bar-disk"></div></div>
+        </div>
+
+        <!-- WiFi -->
+        <div class="sys-item">
+            <div class="sys-label">Wi‑Fi</div>
+            <div class="sys-value" id="sys-wifi">-- dBm</div>
+            <div class="sys-bar"><div id="bar-wifi"></div></div>
+            <div id="wifi-status" class="wifi-status">--</div>
+        </div>
+
+        <!-- Uptime -->
+        <div class="sys-item">
+            <div class="sys-label">Uptime</div>
+            <div class="sys-value" id="sys-uptime">-- h</div>
+        </div>
+
+    </div>
+
+    <!-- Boutons système -->
+    <div class="mode-row">
+        <button class="hud-btn danger" onclick="rebootPi()">REBOOT</button>
+        <button class="hud-btn danger" onclick="shutdownPi()">SHUTDOWN</button>
+    </div>
+
+</section>
+
+<!-- Script JS -->
+<script src="pi.js"></script>
+
+</body>
+</html>

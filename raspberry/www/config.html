@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>AxisOne – Configuration IA</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<header>
+    <h1>AxisOne – Configuration IA</h1>
+    <nav>
+        <a href="index.html">Cockpit</a>
+        <a href="ia.html">IA</a>
+        <a href="config.html" class="active">Config</a>
+        <a href="pi.html">PI</a>
+    </nav>
+</header>
+
+<!-- ============================================================
+     SECTION : TD3 – Exploration
+============================================================ -->
+<section class="card">
+    <h2>🧭 TD3 – Exploration</h2>
+
+    <div class="config-grid">
+
+        <div class="config-item">
+            <label>
+                Noise Scale (exploration)
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Intensité du bruit ajouté aux actions pendant l'exploration.
+                        Plus la valeur est élevée, plus l’IA teste des actions variées.
+                    </span>
+                </span>
+            </label>
+            <input type="range" id="cfg_noise_scale" min="0" max="0.5" step="0.01">
+            <span id="val_noise_scale">--</span>
+        </div>
+
+        <div class="config-item">
+            <label>
+                Policy Noise (target smoothing)
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Bruit ajouté à la target policy pour stabiliser l’apprentissage TD3.
+                        Évite que l’IA apprenne des actions trop précises ou instables.
+                    </span>
+                </span>
+            </label>
+            <input type="range" id="cfg_policy_noise" min="0" max="1" step="0.01">
+            <span id="val_policy_noise">--</span>
+        </div>
+
+        <div class="config-item">
+            <label>
+                Noise Clip
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Limite maximale du bruit ajouté à la target policy.
+                        Empêche des variations trop brutales dans les actions.
+                    </span>
+                </span>
+            </label>
+            <input type="range" id="cfg_noise_clip" min="0" max="1" step="0.01">
+            <span id="val_noise_clip">--</span>
+        </div>
+
+    </div>
+</section>
+
+<!-- ============================================================
+     SECTION : TD3 – Learning
+============================================================ -->
+<section class="card">
+    <h2>📘 TD3 – Learning</h2>
+
+    <div class="config-grid">
+
+        <div class="config-item">
+            <label>
+                Gamma
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Facteur de discount : importance donnée aux récompenses futures.
+                        1.0 = futur très important, 0.8 = futur moins important.
+                    </span>
+                </span>
+            </label>
+            <input type="range" id="cfg_gamma" min="0.8" max="1.0" step="0.01">
+            <span id="val_gamma">--</span>
+        </div>
+
+        <div class="config-item">
+            <label>
+                Learning Rate Actor
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Vitesse d’apprentissage du réseau Actor (génère les actions).
+                        Valeur trop haute = instable, trop basse = lent.
+                    </span>
+                </span>
+            </label>
+            <input type="range" id="cfg_lr_actor" min="0.0001" max="0.01" step="0.0001">
+            <span id="val_lr_actor">--</span>
+        </div>
+
+        <div class="config-item">
+            <label>
+                Learning Rate Critic
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Vitesse d’apprentissage du Critic (évalue la qualité des actions).
+                        Doit souvent être similaire à celui de l’Actor.
+                    </span>
+                </span>
+            </label>
+            <input type="range" id="cfg_lr_critic" min="0.0001" max="0.01" step="0.0001">
+            <span id="val_lr_critic">--</span>
+        </div>
+
+        <div class="config-item">
+            <label>
+                Tau (soft update)
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Taux de mise à jour lente des réseaux cibles.
+                        Plus tau est petit, plus l’apprentissage est stable.
+                    </span>
+                </span>
+            </label>
+            <input type="range" id="cfg_tau" min="0.001" max="0.02" step="0.001">
+            <span id="val_tau">--</span>
+        </div>
+
+        <div class="config-item">
+            <label>
+                Policy Delay
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Nombre d’updates Critic avant une mise à jour Actor.
+                        Valeur typique : 2 (comme dans TD3 original).
+                    </span>
+                </span>
+            </label>
+            <input type="range" id="cfg_policy_delay" min="1" max="5" step="1">
+            <span id="val_policy_delay">--</span>
+        </div>
+
+        <div class="config-item">
+            <label>
+                Batch Size
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Taille des batchs d’entraînement.
+                        Plus grand = apprentissage plus stable mais plus lent.
+                    </span>
+                </span>
+            </label>
+            <input type="range" id="cfg_batch_size" min="16" max="256" step="16">
+            <span id="val_batch_size">--</span>
+        </div>
+
+    </div>
+</section>
+
+<!-- ============================================================
+     SECTION : Robot – Vitesse & Reward
+============================================================ -->
+<section class="card">
+    <h2>🤖 Robot – Vitesse & Reward</h2>
+
+    <div class="config-grid">
+
+        <div class="config-item">
+            <label>
+                Max Speed Linear
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Vitesse linéaire maximale du robot (avant/arrière).
+                        Plus la valeur est élevée, plus le robot est rapide mais difficile à contrôler.
+                    </span>
+                </span>
+            </label>
+            <input type="range" id="cfg_max_speed_linear" min="0.1" max="2" step="0.1">
+            <span id="val_max_speed_linear">--</span>
+        </div>
+
+        <div class="config-item">
+            <label>
+                Max Speed Angular
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Vitesse maximale de rotation du robot.
+                        Valeur élevée = rotations plus rapides mais moins précises.
+                    </span>
+                </span>
+            </label>
+            <input type="range" id="cfg_max_speed_angular" min="0.1" max="2" step="0.1">
+            <span id="val_max_speed_angular">--</span>
+        </div>
+
+        <div class="config-item">
+            <label>
+                Reward Distance Weight
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Importance du reward lié à la réduction de distance vers la cible.
+                        Plus élevé = IA plus motivée à se rapprocher.
+                    </span>
+                </span>
+            </label>
+            <input type="range" id="cfg_reward_distance_weight" min="0" max="5" step="0.1">
+            <span id="val_reward_distance_weight">--</span>
+        </div>
+
+        <div class="config-item">
+            <label>
+                Reward Speed Weight
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Importance du reward lié à la vitesse.
+                        Encourage le robot à se déplacer plus rapidement.
+                    </span>
+                </span>
+            </label>
+            <input type="range" id="cfg_reward_speed_weight" min="0" max="2" step="0.05">
+            <span id="val_reward_speed_weight">--</span>
+        </div>
+
+        <div class="config-item">
+            <label>
+                Collision Penalty
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Pénalité appliquée en cas de collision.
+                        Valeur négative : plus elle est basse, plus l’IA évite les obstacles.
+                    </span>
+                </span>
+            </label>
+            <input type="range" id="cfg_reward_collision_penalty" min="-5" max="0" step="0.1">
+            <span id="val_reward_collision_penalty">--</span>
+        </div>
+
+    </div>
+</section>
+
+<!-- ============================================================
+     SECTION : Radar
+============================================================ -->
+<section class="card">
+    <h2>📡 Radar</h2>
+
+    <div class="config-grid">
+
+        <div class="config-item">
+            <label>
+                Radar Alpha (EMA)
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Coefficient du filtre EMA appliqué aux mesures radar.
+                        Plus alpha est élevé, plus la mesure réagit vite mais devient bruitée.
+                    </span>
+                </span>
+            </label>
+            <input type="range" id="cfg_radar_alpha" min="0.05" max="0.5" step="0.01">
+            <span id="val_radar_alpha">--</span>
+        </div>
+
+        <div class="config-item">
+            <label>
+                Médiane Window
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Taille de la fenêtre du filtre médian.
+                        Plus grande = mesure plus stable mais plus lente.
+                    </span>
+                </span>
+            </label>
+            <input type="range" id="cfg_radar_median_window" min="3" max="15" step="1">
+            <span id="val_radar_median_window">--</span>
+        </div>
+
+        <div class="config-item">
+            <label>
+                Danger Threshold (cm)
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Distance en dessous de laquelle le cockpit affiche une alerte danger.
+                        Utile pour éviter les collisions.
+                    </span>
+                </span>
+            </label>
+            <input type="range" id="cfg_danger_threshold_cm" min="5" max="100" step="1">
+            <span id="val_danger_threshold_cm">--</span>
+        </div>
+
+    </div>
+</section>
+
+<!-- ============================================================
+     SECTION : Debug & Training
+============================================================ -->
+<section class="card">
+    <h2>🧪 Debug & Training</h2>
+
+    <div class="config-grid">
+
+        <div class="config-item">
+            <label>
+                Replay Logging
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Active la sauvegarde des transitions dans un fichier replay.
+                        Utile pour analyser l’apprentissage ou rejouer des épisodes.
+                    </span>
+                </span>
+            </label>
+            <input type="checkbox" id="cfg_enable_replay_logging">
+        </div>
+
+        <div class="config-item">
+            <label>
+                Loss Logging
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Active l’enregistrement des pertes Critic/Actor.
+                        Permet de visualiser la stabilité de l’apprentissage.
+                    </span>
+                </span>
+            </label>
+            <input type="checkbox" id="cfg_enable_loss_logging">
+        </div>
+
+        <div class="config-item">
+            <label>
+                Training Frequency (Hz)
+                <span class="tooltip">ℹ️
+                    <span class="tooltip-text">
+                        Fréquence d’entraînement TD3.
+                        Plus élevée = IA apprend plus vite mais consomme plus de CPU.
+                    </span>
+                </span>
+            </label>
+            <input type="range" id="cfg_train_frequency_hz" min="5" max="50" step="1">
+            <span id="val_train_frequency_hz">--</span>
+        </div>
+
+    </div>
+</section>
+
+<!-- ============================================================
+     SECTION : Boutons d'action
+============================================================ -->
+<section class="card">
+    <h2>💾 Actions</h2>
+
+    <div class="mode-row">
+        <button class="hud-btn mode" onclick="sendConfig()">APPLIQUER</button>
+        <button class="hud-btn mode" onclick="resetConfig()">RESET</button>
+    </div>
+
+    <pre id="configDebug" class="enc-box" style="max-height:150px; overflow:auto;"></pre>
+</section>
+
+<script src="config.js"></script>
+</body>
+</html>
