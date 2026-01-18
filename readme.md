@@ -124,6 +124,6 @@ libcamerasrc → videoconvert → appsink → aiortc → WebRTC → navigateur
 
 Service systemd pour démarrage automatique.
 
-![License](https://img.shields.io/github/license/Inertie78/robot_omni) 
-![Last Commit](https://img.shields.io/github/last-commit/Inertie78/robot_omni) 
+![License](https://img.shields.io/github/license/Inertie78/robot_omni)
+![Last Commit](https://img.shields.io/github/last-commit/Inertie78/robot_omni)
 ![Repo Size](https://img.shields.io/github/repo-size/Inertie78/robot_omni)
