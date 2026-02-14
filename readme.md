@@ -2,7 +2,10 @@
 
 # 🤖 Robot Omni — Architecture complète (Arduino + Raspberry Pi)
 
-![image](picture/omni.png)
+<p align="center">
+  <img src="picture/omni.png" alt="omni" width="250">
+</p>
+
 
 # ============================
 
