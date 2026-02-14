@@ -90,3 +90,27 @@ desktop.ini
 !arduino/
 !arduino/src/
 !arduino/src/**
+
+# ============================
+# Python cache & compiled
+# ============================
+*.pyc
+__pycache__/
+
+# ============================
+# Logs & data
+# ============================
+*.jsonl
+raspberry/data/logs/
+
+# ============================
+# Virtual environments
+# ============================
+.venv/
+venv/
+env/
+
+# ============================
+# Secrets
+# ============================
+.env
