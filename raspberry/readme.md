@@ -1,26 +1,34 @@
-# Robot Omni – Cockpit Web + IA DQN + WebRTC
+# Robot Omni – Cockpit Web + IA TD3 + WebRTC
 
-Ce projet fournit une architecture complète pour piloter un robot omni-directionnel via :
-- un cockpit web (interface temps réel)
-- un serveur Python sur Raspberry Pi
-- une carte Mega (Arduino) pour les moteurs et encodeurs
-- un flux vidéo WebRTC faible latence
-- un radar ultrason
-- une IA DQN capable d’apprendre en temps réel
+Robot omni-directionnel piloté en temps réel via un cockpit web, doté d’un pipeline vidéo WebRTC faible latence, d’un radar ultrason, d’une carte Mega pour les moteurs, et d’une IA TD3 capable d’apprendre en continu sur le robot réel.
 
-Objectif : un robot pilotable, observé, sécurisé et apprenant.
+## Sommaire
 
-# Architecture globale
+- Architecture globale
+- Structure du projet
+- Composants principaux
+- Fonctionnement de l’IA
+- Pipeline vidéo WebRTC
+- Communication WebSocket
+- Installation
+- Lancement
+- Tests rapides
+- Conseils production
 
+## Architecture globale
+
+```
 Cockpit (navigateur) <---- WebRTC ----> Raspberry Pi (server.py)
        |                                      |
        | WebSocket CTRL                       | UART
        | WebSocket ENC / RADAR                |
        v                                      v
 Encodeurs / Radar -------------------------> Mega (moteurs)
+```
 
+## Structure du projet
 
-
+```
 robotOmni/
 │
 ├── server/
@@ -74,268 +82,171 @@ robotOmni/
 │       ├── pi.js
 │
 └── README.md
+```
 
+## Composants principaux
 
-# Composants principaux
-
-1. Cockpit Web (www/)
+### 1. Cockpit Web (www/)
 - Interface HTML/JS/CSS
-- Boutons OMNI
+- Commandes OMNI
 - Affichage vidéo WebRTC
 - Radar en temps réel
 - Modes MANUAL / AI
 
-2. Serveur Python (server.py)
-- WebSocket :
-  /ws-ctrl : commandes cockpit vers robot
-  /ws-enc  : encodeurs vers cockpit
-  /ws-radar : radar vers cockpit
-  /ws-rtc : signalisation WebRTC
+### 2. Serveur Python (server.py)
+- WebSockets :
+  - /ws-ctrl : commandes cockpit → robot
+  - /ws-enc : encodeurs → cockpit
+  - /ws-radar : radar → cockpit
+  - /ws-rtc : signalisation WebRTC
 - WebRTC vidéo CSI
 - UART vers Mega
 - Radar ultrason (thread)
-- IA DQN (boucle RL temps réel)
+- IA TD3 (boucle RL temps réel)
 
-3. Arduino Mega
-- Reçoit "VEL vx vy w"
+### 3. Arduino Mega
+- Reçoit : VEL vx vy w
 - Gère les moteurs
-- Envoie "ENC t1 t2 t3 t4 v1 v2 v3 v4"
+- Envoie : ENC t1 t2 t3 t4 v1 v2 v3 v4
 
-4. IA DQN
-- agent_dqn.py : réseau + replay buffer
-- env_rl.py : environnement robot réel
-- train_rl.py : boucle d’apprentissage
+### 4. IA TD3
+- agent_td3.py : réseau + replay buffer
+- robot_env.py : environnement réel
+- train_rl.py : apprentissage continu
+- ai_loop.py : boucle IA 20 Hz
 
-# Fonctionnement de l’IA
+## Fonctionnement de l’IA
 
-1. Le cockpit active MODE AI
+1. Le cockpit active MODE AI  
 2. Le serveur lance une boucle :
    - observe l’état (radar, vitesse, commandes)
    - choisit une action
    - envoie OMNI
    - reçoit une récompense
-   - apprend
-3. Si collision : reset
+   - apprend  
+3. En cas de collision → reset  
 
-L’agent apprend en continu, sans simulation.
+L’agent apprend en continu, directement sur le robot réel.
 
-# Pipeline vidéo WebRTC
+## Pipeline vidéo WebRTC
 
-libcamerasrc -> videoconvert -> appsink -> aiortc -> WebRTC -> navigateur
+```
+libcamerasrc → videoconvert → appsink → aiortc → WebRTC → navigateur
+```
 
 Avantages :
 - faible latence
 - pas de buffering
 - compatible navigateur
 
-# Communication WebSocket
+## Communication WebSocket
 
-/ws-ctrl :
+### /ws-ctrl
 - OMNI vx vy w
 - STOP
 - MODE MANUAL
 - MODE AI
 
-/ws-enc :
-- JSON encodeurs (ticks + speed)
+### /ws-enc
+- JSON encodeurs (ticks + vitesse)
 
-/ws-radar :
+### /ws-radar
 - distance radar (20 Hz)
 
-/ws-rtc :
+### /ws-rtc
 - signalisation WebRTC (offer/answer)
 
-# Installation
+## Installation
 
-1. Dépendances système :
+### 1. Dépendances système
 
+```bash
 sudo apt update
 sudo apt install python3-opencv python3-pip python3-numpy \
                  gstreamer1.0-tools gstreamer1.0-plugins-base \
                  gstreamer1.0-plugins-good gstreamer1.0-plugins-bad \
                  gstreamer1.0-plugins-ugly gstreamer1.0-libav \
                  gstreamer1.0-webrtc libatlas-base-dev
+```
 
-2. Environnement Python :
+### 2. Environnement Python
 
+```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip install aiortc websockets av
+```
 
-3. Lier OpenCV système dans .venv :
+### 3. Lier OpenCV système dans .venv
 
+```bash
 ln -s /usr/lib/python3/dist-packages/cv2*.so .venv/lib/python3.11/site-packages/
 pip install "numpy<2"
+```
 
-# Lancement
+## Lancement
 
+```bash
 source .venv/bin/activate
-python3 server.py
-
-Puis ouvrir dans un navigateur :
-http://<ip_du_pi>:8080
-
-# Tests rapides
-
-Encodeurs :
-ws://<ip>:8765/ws-enc
-
-Radar :
-ws://<ip>:8765/ws-radar
-
-OMNI :
-Utiliser les boutons du cockpit
-
-IA :
-Bouton MODE AI
-
-# Dépannage
-
-Video noire :
-- vérifier pipeline GStreamer
-- vérifier caméra CSI activée
-- tester "libcamera-hello"
-
-IA immobile :
-- vérifier /ws-ctrl
-- vérifier UART Mega
-- vérifier que MODE AI est envoyé
-
-Radar = -1 :
-- vérifier câblage TRIG/ECHO
-- vérifier alimentation 5V
-- vérifier radar.start_radar()
-
-
-Installation :
-pip install -r requirements.txt
-
-
-
-python3 server/web/http_server.py
-
-
-
-
-🟩 2. DÉPENDANCES PYTHON
-Créer un fichier :
-
-Code
-requirements.txt
-Avec :
-
-Code
-aiortc
-opencv-python
-numpy
-websockets
-RPi.GPIO
-av
-torch
-Installation :
-
-Code
-pip install -r requirements.txt
-🟩 3. SERVICES À LANCER
-🔧 1. Serveur HTTP (cockpit)
-Code
-python3 server/web/http_server.py
-Accessible sur :
-
-Code
-http://<ip_du_pi>:8080
-🔧 2. Serveur principal (WebSockets + IA + UART + Radar + WebRTC)
-Code
 python3 server/server.py
-Ce serveur :
+```
 
-démarre UART
+Puis ouvrir :
 
-démarre radar
+http://<ip_du_pi>:8080
 
-démarre WebRTC
+## Tests rapides
 
-démarre WebSockets
+### Radar
 
-attend les commandes cockpit
-
-🟩 4. FLUX COMPLET DE FONCTIONNEMENT
-🟦 1. Le cockpit charge index.html
-WebRTC → vidéo CSI
-
-WebSocket /ws-ctrl → commandes
-
-WebSocket /ws-radar → radar
-
-WebSocket /ws-enc → encodeurs
-
-🟦 2. Le cockpit IA charge ia.html
-WebSocket /ws-ai → infos IA temps réel
-
-WebSocket /ws-ai-config → paramètres IA
-
-🟦 3. Le serveur reçoit MODE AI
-ws_ctrl.py → start_ai()
-
-ai_loop.py → boucle IA 20 Hz
-
-train_rl.py → TD3 temps réel
-
-robot_env.py → step()
-
-ws_ai.py → diffusion cockpit
-
-🟦 4. Le cockpit IA affiche :
-distance
-
-vitesse
-
-reward
-
-critic_loss
-
-actor_loss
-
-épisode
-
-actions vx/vy/w
-
-🟩 5. TESTS FINAUX
-✔️ Test 1 — Radar
-Code
+```bash
 python3 -c "import hardware.radar_hcsr04 as r; r.start_radar(); import time; 
            [print(r.distance_value) or time.sleep(0.1) for _ in range(20)]"
-✔️ Test 2 — UART
-Code
+```
+
+### UART
+
+```bash
 python3 -c "from hardware.uart import send_to_mega; send_to_mega('VEL 0 0 0')"
-✔️ Test 3 — WebRTC
-Ouvre index.html → vidéo doit apparaître.
+```
 
-✔️ Test 4 — IA
-Dans cockpit → MODE AI → les graphes IA doivent bouger.
+### WebRTC
 
-🟩 6. CONSEILS PRODUCTION
-🔥 Démarrer automatiquement au boot
-Créer un service systemd :
+Ouvrir index.html → la vidéo doit apparaître.
 
-Code
-sudo nano /etc/systemd/system/axisone.service
+### IA
+
+Dans le cockpit → MODE AI
+
+## Conseils production
+
+### Service systemd
+
+Créer :
+
+```bash
+sudo nano /etc/systemd/system/robotomni.service
+```
+
 Contenu :
 
-Code
+```
 [Unit]
-Description=AxisOne Server
+Description=Robot Omni Server
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/python3 /home/pi/AxisOne/server/server.py
+ExecStart=/usr/bin/python3 /home/pi/robotOmni/server/server.py
 Restart=always
 User=pi
 
 [Install]
 WantedBy=multi-user.target
+```
+
 Activer :
 
-Code
-sudo systemctl enable axisone
-sudo systemctl start axisone
+```bash
+sudo systemctl enable robotomni
+sudo systemctl start robotomni
+```
