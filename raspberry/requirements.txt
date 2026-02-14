@@ -1,0 +1,7 @@
+aiortc
+opencv-python
+numpy
+websockets
+RPi.GPIO
+av
+torch
