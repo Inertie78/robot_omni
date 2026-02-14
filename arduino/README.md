@@ -2,7 +2,7 @@
 # ARDUINO
 # ============================
 
-# ⚙️ RobotConfig — Configuration globale du robot (Arduino)
+## ⚙️ RobotConfig — Configuration globale du robot (Arduino)
 
 Le fichier `RobotConfig.h` centralise tous les paramètres globaux du robot à roues **Mecanum**.  
 Toute modification impacte directement :

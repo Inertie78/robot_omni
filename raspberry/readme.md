@@ -1,4 +1,6 @@
+# ============================
 # Robot Omni – Cockpit Web + IA TD3 + WebRTC
+# ============================
 
 Robot omni-directionnel piloté en temps réel via un cockpit web, doté d’un pipeline vidéo WebRTC faible latence, d’un radar ultrason, d’une carte Mega pour les moteurs, et d’une IA TD3 capable d’apprendre en continu sur le robot réel.
 
