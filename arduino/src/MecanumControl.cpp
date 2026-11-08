@@ -348,6 +348,25 @@ void mecanumUpdatePID() {
 }
 
 // ======================================================
+// REMISE A ZERO DES ENCODEURS
+// ======================================================
+
+void mecanumResetEncoders() {
+
+  noInterrupts();
+
+  for (int i = 0; i < 4; i++) {
+    ticks[i] = 0;
+    speedCount[i] = 0;
+    wheelSpeed[i] = 0.0f;
+  }
+
+  interrupts();
+
+  Serial.println("[ENC] Compteurs remis a zero");
+}
+
+// ======================================================
 // ARRET D’URGENCE
 // ======================================================
 /**
