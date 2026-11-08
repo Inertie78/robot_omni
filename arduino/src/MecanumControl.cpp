@@ -300,29 +300,50 @@ void mecanumSetCommand(float vx, float vy, float w) {
  * Format série :
  * ENC ticks[4] wheelSpeed[4]
  */
+
 void mecanumUpdateEncoders() {
+
   unsigned long now = millis();
+
   if (now - lastSpeedTime < 100) return;
 
   float dt = (now - lastSpeedTime) / 1000.0f;
   lastSpeedTime = now;
 
+  long ticksSnapshot[4];
+  long speedSnapshot[4];
+
+  // Lecture atomique des compteurs
+  noInterrupts();
+
   for (int i = 0; i < 4; i++) {
-    noInterrupts();
-    long sc = speedCount[i];
+    ticksSnapshot[i] = ticks[i];
+
+    speedSnapshot[i] = speedCount[i];
+
     speedCount[i] = 0;
-    interrupts();
-
-    wheelSpeed[i] = sc / dt;
   }
 
+  interrupts();
+
+  // Calcul des vitesses
+  for (int i = 0; i < 4; i++) {
+    wheelSpeed[i] = speedSnapshot[i] / dt;
+  }
+
+  // Transmission UART
   Serial3.print("ENC ");
+
   for (int i = 0; i < 4; i++) {
-    Serial3.print(ticks[i]); Serial3.print(" ");
+    Serial3.print(ticksSnapshot[i]);
+    Serial3.print(" ");
   }
+
   for (int i = 0; i < 4; i++) {
-    Serial3.print(wheelSpeed[i]); Serial3.print(" ");
+    Serial3.print(wheelSpeed[i]);
+    Serial3.print(" ");
   }
+
   Serial3.println();
 }
 
