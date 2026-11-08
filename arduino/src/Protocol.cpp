@@ -126,6 +126,20 @@ static void handleLine(String &line) {
   }
 
   // ====================================================
+  // COMMANDE RESET ENCODEURS
+  // ====================================================
+  if (clean == "RESET_ENC") {
+
+    mecanumResetEncoders();
+
+    Serial3.println("ENC_RESET_OK");
+
+    lastCommandTime = millis();
+
+    return;
+  }
+
+  // ====================================================
   // COMMANDE INCONNUE
   // ====================================================
   Serial.print("[Protocol] Commande inconnue: ");
