@@ -384,6 +384,9 @@ void mecanumResetEncoders() {
 
   interrupts();
 
+  // Réinitialisation du chronométrage
+  lastSpeedTime = millis();
+
   Serial.println("[ENC] Compteurs remis a zero");
 }
 
